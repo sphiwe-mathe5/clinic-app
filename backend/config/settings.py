@@ -32,7 +32,12 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-fallback-for-dev')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+# Cleanly parse ALLOWED_HOSTS (strip spaces, remove https://, ignore empty)
+raw_hosts = os.environ.get('ALLOWED_HOSTS', '*')
+ALLOWED_HOSTS = [h.strip().replace('https://', '').replace('http://', '').strip('/') for h in raw_hosts.split(',') if h.strip()]
+
+if not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ['*']
 
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
@@ -148,6 +153,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Ensure the staticfiles directory exists so Whitenoise doesn't throw a warning
+import os
+os.makedirs(STATIC_ROOT, exist_ok=True)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
