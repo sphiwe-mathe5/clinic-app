@@ -32,9 +32,23 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-fallback-for-dev')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# Cleanly parse ALLOWED_HOSTS (strip spaces, remove https://, ignore empty)
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(',')
+raw_hosts = os.environ.get('ALLOWED_HOSTS', 'cims.up.railway.app,ciims.vercel.app')
+# Parse domains for CSRF (clean them up)
+clean_hosts = [h.strip().replace('https://', '').replace('http://', '').replace('"', '').replace("'", '').strip('/') for h in raw_hosts.split(',') if h.strip()]
+
+# Let Django accept any incoming request host (Railway routers, IPs, etc.)
+ALLOWED_HOSTS = ['*']
+
+# Ensure CSRF still trusts the frontend and backend explicitly
+CSRF_TRUSTED_ORIGINS = [
+    "https://cims.up.railway.app",
+    "https://ciims.vercel.app"
+]
+for h in clean_hosts:
+    if h != '*':
+        origin = f"https://{h}"
+        if origin not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(origin)
 
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
