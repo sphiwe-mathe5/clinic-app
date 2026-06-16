@@ -24,9 +24,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         user = User.objects.create(
             username=validated_data['email'],
             email=validated_data['email'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name'],
-            campus=validated_data.get('campus'),
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', ''),
+            campus=validated_data.get('campus', ''),
             role='nurse'
         )
         user.set_password(validated_data['password'])
