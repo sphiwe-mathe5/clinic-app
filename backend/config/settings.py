@@ -39,6 +39,8 @@ ALLOWED_HOSTS = [h.strip().replace('https://', '').replace('http://', '').strip(
 if not ALLOWED_HOSTS:
     ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = [f"https://{h}" for h in ALLOWED_HOSTS if h != '*']
+
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
