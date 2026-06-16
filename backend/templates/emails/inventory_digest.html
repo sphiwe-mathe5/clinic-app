@@ -1,0 +1,103 @@
+{% extends "emails/base.html" %}
+
+{% block extra_css %}
+<style>
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+        margin-bottom: 24px;
+        font-size: 14px;
+    }
+    .data-table th, .data-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #27272a;
+    }
+    .data-table th {
+        font-weight: 600;
+        color: #a1a1aa;
+    }
+    .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .badge-critical {
+        background-color: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.5);
+    }
+    .badge-warning {
+        background-color: rgba(245, 158, 11, 0.2);
+        color: #f59e0b;
+        border: 1px solid rgba(245, 158, 11, 0.5);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2>Inventory Alert Digest</h2>
+<p>Hello {{ user.first_name|default:"User" }},</p>
+<p>Here is your automated inventory summary. The following items require your attention:</p>
+
+{% if critical_alerts %}
+<div class="card" style="border-color: rgba(239, 68, 68, 0.3);">
+    <h3 style="margin-top: 0; color: #ef4444; font-size: 16px;">Critical Action Required</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Batch</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for alert in critical_alerts %}
+            <tr>
+                <td style="color: #fafafa; font-weight: 500;">{{ alert.product.name|default:"System" }}</td>
+                <td>{{ alert.batch.batch_number|default:"N/A" }}</td>
+                <td>
+                    <span class="badge badge-critical">Critical</span><br>
+                    <span style="display: block; margin-top: 4px; color: #d4d4d8;">{{ alert.message }}</span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if warning_alerts %}
+<div class="card" style="border-color: rgba(245, 158, 11, 0.3);">
+    <h3 style="margin-top: 0; color: #f59e0b; font-size: 16px;">Warnings</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Batch</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for alert in warning_alerts %}
+            <tr>
+                <td style="color: #fafafa; font-weight: 500;">{{ alert.product.name|default:"System" }}</td>
+                <td>{{ alert.batch.batch_number|default:"N/A" }}</td>
+                <td>
+                    <span class="badge badge-warning">Warning</span><br>
+                    <span style="display: block; margin-top: 4px; color: #d4d4d8;">{{ alert.message }}</span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<div style="text-align: center; margin-top: 32px;">
+    <a href="http://localhost:3000/dashboard" class="btn">Go to Dashboard</a>
+</div>
+{% endblock %}
